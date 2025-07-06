@@ -36,16 +36,16 @@ pipeline {
                 sh '''#!/bin/bash
                     set -e
 
-                        echo 'Testing...'
-                        curl -Ls https://astral.sh/uv/install.sh | bash
-                        export PATH="$HOME/.local/bin:$PATH"
+                    echo 'Testing...'
+                    curl -Ls https://astral.sh/uv/install.sh | bash
+                    export PATH="$HOME/.local/bin:$PATH"
 
                     # Debug: Print env vars (masked sensitive values)
                     echo "Environment loaded. Testing connection..."
                         
-                        uv sync --locked --no-cache
-                        uv run --no-cache pytest
-                    '''
+                    uv sync --locked --no-cache
+                    uv run --no-cache pytest
+                '''
             }
         }
 
@@ -60,9 +60,6 @@ pipeline {
                 script {
                     echo 'Building...'
                     
-                    // Clean up before build to free space
-                    sh 'docker system prune -f'
-                    
                     // Build a clean image without any secrets
                     def dockerImage = docker.build(registry + ":$BUILD_NUMBER")
                     echo "Pushing image to DockerHub..."
@@ -70,9 +67,6 @@ pipeline {
                         dockerImage.push()
                         dockerImage.push('latest')
                     }
-                    
-                    // Clean up after build to free space
-                    sh 'docker system prune -f'
                 }
             }
         }

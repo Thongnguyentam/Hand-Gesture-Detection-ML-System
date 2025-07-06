@@ -66,9 +66,15 @@ if tracer:
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*'],  # Allow all origins
+    allow_origins=[
+        "http://localhost:3000",  # React dev server
+        "http://localhost:8000",  # Local FastAPI docs
+        "http://localhost:8080",  # Local frontend
+        "https://asl.34.63.222.25.nip.io",  # Production domain
+        "http://asl.34.63.222.25.nip.io",   # Production domain (HTTP)
+    ],
     allow_credentials=True,
-    allow_methods=['*'],
+    allow_methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allow_headers=['*'],
 )
 
