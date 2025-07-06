@@ -152,17 +152,17 @@ class APIGatewayMiddleware(BaseHTTPMiddleware):
                     # Run background task to write log
                     background_tasks = BackgroundTasks()
                     body_str = json.dumps({"detail": error_message})
-                    background_tasks.add_task(
-                        self.handle_log,
-                        request,
-                        request_body,
-                        status.HTTP_400_BAD_REQUEST,
-                        error_message,
-                        original_path,
-                        start_time,
-                        response_time,
-                        body_str
-                    )
+                    # background_tasks.add_task(
+                    #     self.handle_log,
+                    #     request,
+                    #     request_body,
+                    #     status.HTTP_400_BAD_REQUEST,
+                    #     error_message,
+                    #     original_path,
+                    #     start_time,
+                    #     response_time,
+                    #     body_str
+                    # )
                     response.background = background_tasks
                     return response
             
@@ -244,19 +244,19 @@ class APIGatewayMiddleware(BaseHTTPMiddleware):
                 body_str = json.dumps({"detail": error_message})
             
             # Run background task to write log
-            background_tasks = BackgroundTasks()
-            background_tasks.add_task(
-                self.handle_log,
-                request,
-                request_body,
-                response.status_code,
-                error_message,
-                original_path,
-                start_time,
-                response_time,
-                body_str
-            )
-            response.background = background_tasks
+            # background_tasks = BackgroundTasks()
+            # background_tasks.add_task(
+            #     self.handle_log,
+            #     request,
+            #     request_body,
+            #     response.status_code,
+            #     error_message,
+            #     original_path,
+            #     start_time,
+            #     response_time,
+            #     body_str
+            # )
+            # response.background = background_tasks
             
             return response
             
