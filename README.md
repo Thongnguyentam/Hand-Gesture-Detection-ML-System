@@ -5,6 +5,10 @@ A real-time hand gesture recognition system featuring a Python OpenCV client and
 ---
 
 ## Architecture Overview
+<div align="center">
+  <img src="images/asl_architecture.png" alt="Jaeger Architecture Overview" width="800">
+  <p><em>Figure 1: Complete architecture for serving ASL hand gesture detection API</em></p>
+</div>
 
 This project is composed of several key components that work together to provide a seamless development and deployment experience:
 
