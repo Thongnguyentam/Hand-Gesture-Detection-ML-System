@@ -1,3 +1,4 @@
+import logging
 from api.middleware.log import APIGatewayMiddleware
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,18 +23,25 @@ from opentelemetry.sdk.resources import Resource
 
 from api.utils.tracer import configure_tracing
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 # Initialize tracing if enabled - MUST happen before app creation
 tracer = None
-print(ENABLE_TRACING)
+logger.info(f"ENABLE_TRACING setting: {ENABLE_TRACING}")
 if ENABLE_TRACING.lower() == "true":
-    print(f"[TRACING] Initializing tracing for service: {ENABLE_TRACING}")
+    logger.info(f"[TRACING] Initializing tracing for service: {ENABLE_TRACING}")
     tracer = configure_tracing()
-    print(f"[TRACING] Tracer configured: {type(tracer)}")
+    logger.info(f"[TRACING] Tracer configured: {type(tracer)}")
     
     # Initialize instrumentation immediately
     RequestsInstrumentor().instrument()
     PymongoInstrumentor().instrument()
-    print("[TRACING] Instrumentation configured")
+    logger.info("[TRACING] Instrumentation configured")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):  
@@ -53,7 +61,7 @@ app = FastAPI(lifespan=lifespan, root_path="/api")
 # Instrument FastAPI after app creation but before adding middleware
 if tracer:
     FastAPIInstrumentor.instrument_app(app, tracer_provider=trace.get_tracer_provider())
-    print("[TRACING] FastAPI instrumentation applied")
+    logger.info("[TRACING] FastAPI instrumentation applied")
 
 # Configure CORS
 app.add_middleware(
@@ -70,7 +78,7 @@ app.add_middleware(APIGatewayMiddleware)
 
 # Add a basic health check endpoint
 @app.get("/health")
-async def health_check():
+def health_check():
     """Health check endpoint to verify the API is running."""
     if tracer:
         with tracer.start_as_current_span("health_check") as span:
