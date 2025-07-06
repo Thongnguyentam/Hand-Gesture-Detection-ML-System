@@ -72,7 +72,7 @@ async def main():
         
         try:
             while True:
-                fps = cvFpsCalc.get()
+                fps = cvFpsCalc.get_fps()
 
                 # Process Key (ESC: end)
                 key = cv.waitKey(10)

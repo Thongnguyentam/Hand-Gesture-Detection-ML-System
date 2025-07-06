@@ -16,11 +16,6 @@ ENV PATH="/app/.venv/bin:$PATH" \
 # the /app folder is the current working directory
 WORKDIR /app
 
-# Copy necessary files to our app
-COPY ./api ./api
-COPY ./model ./model
-COPY ./main.py ./main.py
-
 # Copy dependency files first for layer caching
 COPY uv.lock pyproject.toml ./
 
@@ -33,5 +28,10 @@ RUN uv sync --locked
 
 # Check if uvicorn is installed
 RUN uvicorn --version
+
+# Copy necessary files to our app
+COPY ./api ./api
+COPY ./model ./model
+COPY ./main.py ./main.py
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "30000"]
