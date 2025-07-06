@@ -1,0 +1,2 @@
+action_datetime,path_name,method,ip,status_response,response,description,request_body,request_query,duration
+2025-06-19 10:51:33,/login,POST,127.0.0.1,200,"{""access_token"":""eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0aG9uZ25ndXllbnRhbUBnbWFpbC5jb20iLCJleHAiOjE3NTAzOTE0OTN9.Al0eBMPQ-VxT968kxNvW10Qb6KmZ3tEolcw-Fgs008E"",""user"":{""userId"":""684c8f7f6a34d976b24203ed"",""username"":""thongnguyentam@gmail.com"",""priviledge"":""user""}}",,b'username=thongnguyentam%40gmail.com&password=Meomeomeo123%40',"{'path': {}, 'query': {}}",0.778

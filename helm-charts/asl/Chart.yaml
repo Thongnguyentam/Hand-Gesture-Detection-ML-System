@@ -1,0 +1,11 @@
+apiVersion: v2
+name: hand-gesture-detection
+description: A Helm chart for deploying the ASL model
+version: 0.1.0
+appVersion: 0.1.0
+type: application
+
+maintainers:
+  - name: Thong Nguyen
+    email: thongnguyentam@gmail.com
+

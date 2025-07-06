@@ -1,0 +1,16 @@
+/env/*
+/env
+/data/*
+/data/
+/data/*/*
+/model/keypoint_classifier/*.csv
+/model/point_history_classifier/*.csv
+/*/__pycache__/
+/iac/.terraform/*
+/iac/terraform.tfvars
+*.json
+.env
+/.venv/
+*.crt
+jenkins-kubeconfig.yaml
+k9s_linux_amd64.deb.1
