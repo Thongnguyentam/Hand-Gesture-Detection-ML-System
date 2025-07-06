@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-deployment
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.service.port }}"
+        prometheus.io/path: "/metrics"
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Release.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          env:
+            {{- if .Values.tracing.enabled }}
+            - name: ENABLE_TRACING
+              value: "true"
+            - name: OTEL_SERVICE_NAME
+              value: {{ .Values.tracing.serviceName | quote }}
+            - name: JAEGER_COLLECTOR_HOST
+              value: {{ .Values.tracing.jaegerCollectorHost | quote }}
+            - name: JAEGER_AGENT_PORT
+              value: {{ .Values.tracing.jaegerAgentPort | quote }}
+            - name: OTEL_EXPORTER_JAEGER_ENDPOINT
+              value: {{ .Values.tracing.jaegerCollectorEndpoint | quote }}
+            {{- else }}
+            - name: ENABLE_TRACING
+              value: "false"
+            {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ .Release.Name }}-secrets
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

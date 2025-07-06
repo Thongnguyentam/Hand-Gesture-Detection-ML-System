@@ -1,0 +1,32 @@
+# Default values for asl deployment
+replicaCount: 1
+
+image:
+  repository: thongnguyen0101/hand-gesture-detection
+  tag: latest
+  pullPolicy: Always # ensure it pulls the latest image every time
+
+service:
+  type: ClusterIP
+  port: 30000
+
+# Placeholder for secrets (DO NOT put actual values here)
+secrets:
+  mongodbUrl: ""  # Will be overridden by Jenkins pipeline
+  jwtSecret: ""   # Will be overridden by Jenkins pipeline
+  githubToken: "" # Will be overridden by Jenkins pipeline
+
+ingress:
+  host: "asl.34.63.222.25.nip.io"
+
+# Tracing configuration - Direct connection to Jaeger All-in-One
+tracing:
+  enabled: true
+  serviceName: "hand-gesture-api"
+  # Direct connection to all-in-one (bypassing agent)
+  jaegerCollectorHost: "jaeger-collector.tracing.svc.cluster.local"
+  jaegerCollectorPort: "4317"  # OTLP gRPC port
+  # Legacy config (not used in current setup)
+  jaegerAgentHost: "jaeger-agent.tracing.svc.cluster.local"
+  jaegerAgentPort: "6831"
+  jaegerCollectorEndpoint: "http://jaeger-collector.tracing.svc.cluster.local:14268/api/traces"
