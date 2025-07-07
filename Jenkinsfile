@@ -24,11 +24,12 @@ pipeline {
     }
 
     stages {
-        // Only run Test and Build on main branch or PRs
+        // Run Test and Build on main branch, feature/initial-code branch, or PRs
         stage('Test') {
             when {
                 anyOf {
                     branch 'main'
+                    branch 'feature/initial-code'
                     changeRequest()
                 }
             }
@@ -50,16 +51,16 @@ pipeline {
         }
 
         stage('Build') {
-            when { // Only run Build on main branch or PRs
+            when { // Run Build on main branch, feature/initial-code branch, or PRs
                 anyOf {
                     branch 'main'
+                    branch 'feature/initial-code'
                     changeRequest() // handle PRs
                 }
             }
             steps {
                 script {
                     echo 'Building...'
-                    
                     // Build a clean image without any secrets
                     def dockerImage = docker.build(registry + ":$BUILD_NUMBER")
                     echo "Pushing image to DockerHub..."
@@ -71,10 +72,13 @@ pipeline {
             }
         }
 
-        // Only deploy from main branch
+        // Deploy from main branch and feature/initial-code branch
         stage('Deploy') {
             when {
-                branch 'main'
+                anyOf {
+                    branch 'main'
+                    branch 'feature/initial-code'
+                }
             }
             steps {
                 // Wrap the entire stage's logic in withCredentials to securely load the GCloud key
@@ -98,13 +102,13 @@ secrets:
                                 sh '''#!/bin/bash
                                     set -e
 
-                    echo "Authenticating with Google Cloud..."
+                                    echo "Authenticating with Google Cloud..."
                                     gcloud auth activate-service-account --key-file="$GCLOUD_KEY"
 
-                    echo "Fetching GKE credentials..."
+                                    echo "Fetching GKE credentials..."
                                     gcloud container clusters get-credentials "$CLUSTER" --region="$GCP_REGION" --project="$GCP_PROJECT"
 
-                    echo "Deploying with Helm..."
+                                    echo "Deploying with Helm..."
                                     helm upgrade "$RELEASE" "$CHART_PATH" \
                                         --install \
                                         --create-namespace \
