@@ -3,9 +3,7 @@ import json
 import logging
 import sys
 from fastapi import BackgroundTasks, HTTPException, Request, Response, status
-
 from fastapi.responses import JSONResponse
-from requests import Session
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from api.constant.log import LENGTH_MAX_RESPONSE
