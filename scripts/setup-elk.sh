@@ -49,7 +49,7 @@ check_command() {
 wait_for_pods() {
     local namespace=$1
     local label_selector=$2
-    local timeout=${3:-300}
+    local timeout=${3:-300} # 300 seconds = 5 minutes
     
     print_status "Waiting for pods with label '$label_selector' in namespace '$namespace' to be ready..."
     
@@ -140,7 +140,7 @@ install_elasticsearch() {
         exit 1
     fi
     
-    helm install elasticsearch elastic/elasticsearch \
+    helm upgrade --install elasticsearch elastic/elasticsearch \
         -n "$NAMESPACE" \
         -f "$values_file" \
         --timeout "$HELM_TIMEOUT" \
@@ -181,7 +181,7 @@ install_kibana() {
         exit 1
     fi
     
-    helm install kibana elastic/kibana \
+    helm upgrade --install kibana elastic/kibana \
         -n "$NAMESPACE" \
         -f "$values_file" \
         --timeout "$HELM_TIMEOUT" \
@@ -205,7 +205,7 @@ install_logstash() {
         exit 1
     fi
     
-    helm install logstash elastic/logstash \
+    helm upgrade --install logstash elastic/logstash \
         -n "$NAMESPACE" \
         -f "$values_file" \
         --timeout "$HELM_TIMEOUT" \
@@ -228,7 +228,7 @@ install_filebeat() {
         exit 1
     fi
     
-    helm install filebeat elastic/filebeat \
+    helm upgrade --install filebeat elastic/filebeat \
         -n "$NAMESPACE" \
         -f "$values_file" \
         --timeout "$HELM_TIMEOUT" \
@@ -264,7 +264,7 @@ verify_installation() {
         
         # Port forward in background
         kubectl port-forward svc/elasticsearch-master -n "$NAMESPACE" 9200:9200 &
-        local pf_pid=$!
+        local pf_pid=$! # $! is the process ID of the last background process
         sleep 5
         
         # Test connection
@@ -301,7 +301,7 @@ show_usage() {
 
 # Main script logic
 main() {
-    case "${1:-}" in
+    case "${1:-}" in # checks the first argument ($1) passed to the script.
         cleanup)
             cleanup_elk
             ;;
@@ -340,3 +340,9 @@ main() {
 
 # Run main function with all arguments
 main "$@"
+
+# ./scripts/setup-elk.sh install
+# ./scripts/setup-elk.sh reinstall
+# ./scripts/setup-elk.sh verify
+# ./scripts/setup-elk.sh cleanup
+# ./scripts/setup-elk.sh help
