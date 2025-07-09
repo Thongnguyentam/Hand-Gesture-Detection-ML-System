@@ -78,6 +78,7 @@ pipeline {
                 anyOf {
                     branch 'main'
                     branch 'feature/initial-code'
+                    changeRequest()
                 }
             }
             steps {
