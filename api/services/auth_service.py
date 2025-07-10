@@ -62,9 +62,6 @@ class AuthService:
                 content=serialized_user,
                 status_code=status.HTTP_201_CREATED
             )
-        except HTTPException as e:
-            # Re-raise HTTP exceptions as they are already properly formatted
-            raise e
         except Exception as e:
             # Handle any other exceptions
             raise HTTPException(
