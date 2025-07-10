@@ -60,9 +60,9 @@ pipeline {
                     archiveArtifacts artifacts: 'coverage.xml', allowEmptyArchive: true
                     
                     // Publish coverage results using modern Coverage API plugin
-                    publishCoverage adapters: [
-                        istanbulCoberturaAdapter('coverage.xml')
-                    ], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
+                    recordCoverage tools: [
+                        cobertura(pattern: 'coverage.xml')
+                    ]
                 }
                 failure {
                     echo "❌ Tests failed or coverage below ${COVERAGE_THRESHOLD}%. Pipeline stopped."
