@@ -59,9 +59,9 @@ pipeline {
                     // Archive coverage reports
                     archiveArtifacts artifacts: 'coverage.xml', allowEmptyArchive: true
                     
-                    // Publish coverage results if using coverage plugins
-                    publishCoverage adapters: [ 
-                        coberturaAdapter('coverage.xml')
+                    // Publish coverage results using modern Coverage API plugin
+                    publishCoverage adapters: [
+                        istanbulCoberturaAdapter('coverage.xml')
                     ], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
                 }
                 failure {
