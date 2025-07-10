@@ -21,6 +21,8 @@ pipeline {
         MONGODB_CONNECTION_URL = credentials('MONGODB_CONNECTION_URL')
         JWT_SECRET = credentials('JWT_SECRET')
         GITHUB_TOKEN = credentials('github_access_token')
+        // Coverage threshold
+        COVERAGE_THRESHOLD = '80'
     }
 
     stages {
@@ -37,7 +39,7 @@ pipeline {
                 sh '''#!/bin/bash
                     set -e
 
-                    echo 'Testing...'
+                    echo 'Testing with coverage enforcement...'
                     curl -Ls https://astral.sh/uv/install.sh | bash
                     export PATH="$HOME/.local/bin:$PATH"
 
@@ -45,17 +47,43 @@ pipeline {
                     echo "Environment loaded. Testing connection..."
                         
                     uv sync --locked --no-cache
-                    uv run --no-cache pytest
+                    
+                    echo "Running tests with coverage..."
+                    uv run --no-cache pytest --cov=api --cov-report=term-missing --cov-report=xml --cov-config=pyproject.toml --cov-fail-under=${COVERAGE_THRESHOLD}
+                    
+                    echo "Coverage check passed! Proceeding with pipeline..."
                 '''
+            }
+            post {
+                always {
+                    // Archive coverage reports
+                    archiveArtifacts artifacts: 'coverage.xml', allowEmptyArchive: true
+                    
+                    // Publish coverage results if using coverage plugins
+                    publishCoverage adapters: [ 
+                        coberturaAdapter('coverage.xml')
+                    ], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
+                }
+                failure {
+                    echo "❌ Tests failed or coverage below ${COVERAGE_THRESHOLD}%. Pipeline stopped."
+                }
+                success {
+                    echo "✅ Tests passed with coverage >= ${COVERAGE_THRESHOLD}%. Proceeding to build..."
+                }
             }
         }
 
         stage('Build') {
-            when { // Run Build on main branch, feature/initial-code branch, or PRs
-                anyOf {
-                    branch 'main'
-                    branch 'feature/initial-code'
-                    changeRequest() // handle PRs
+            when { 
+                allOf {
+                    // Run Build on main branch, feature/initial-code branch, or PRs
+                    anyOf {
+                        branch 'main'
+                        branch 'feature/initial-code'
+                        changeRequest() // handle PRs
+                    }
+                    // Only proceed if Test stage was successful
+                    expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
                 }
             }
             steps {
@@ -75,10 +103,14 @@ pipeline {
         // Deploy from main branch and feature/initial-code branch
         stage('Deploy') {
             when {
-                anyOf {
-                    branch 'main'
-                    branch 'feature/initial-code'
-                    changeRequest()
+                allOf {
+                    anyOf {
+                        branch 'main'
+                        branch 'feature/initial-code'
+                        changeRequest()
+                    }
+                    // Only proceed if previous stages were successful
+                    expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
                 }
             }
             steps {
@@ -124,6 +156,19 @@ secrets:
                     }
                 }
             }
+        }
+    }
+    
+    post {
+        failure {
+            echo "❌ Pipeline failed. Check the logs above for details."
+        }
+        success {
+            echo "✅ Pipeline completed successfully!"
+        }
+        always {
+            // Clean up workspace
+            cleanWs()
         }
     }
 }

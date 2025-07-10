@@ -45,3 +45,25 @@ dependencies = [
     "opentelemetry-exporter-otlp-proto-grpc>=1.15.0",
     "opentelemetry-exporter-prometheus>=0.55b1",
 ]
+
+[tool.coverage.run]
+source = ["api"]
+omit = [
+    "*/tests/*",
+    "*/database/database.py",
+    "*/utils/logger.py", 
+    "*/utils/tracer.py",
+    "*/middleware/log.py"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:"
+]
