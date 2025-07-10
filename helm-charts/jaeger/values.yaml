@@ -650,13 +650,13 @@ query:
   agentSidecar:
     enabled: false
   annotations: {}
-  image:
-    registry: ""
-    repository: jaegertracing/jaeger-query
-    tag: ""
-    digest: ""
-    pullPolicy: IfNotPresent
-    pullSecrets: []
+  # image:
+  #   registry: ""
+  #   repository: jaegertracing/jaeger-query
+  #   tag: ""
+  #   digest: ""
+  #   pullPolicy: IfNotPresent
+  #   pullSecrets: []
   dnsPolicy: ClusterFirst
   cmdlineParams: {}
   extraEnv: []
@@ -676,7 +676,7 @@ query:
       name: admin
       targetPort: admin
   # Enable ingress for Jaeger UI
-  ingress:
+  # ingress:
     enabled: true
     ingressClassName: nginx
     annotations:
