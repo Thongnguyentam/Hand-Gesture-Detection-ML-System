@@ -55,15 +55,6 @@ pipeline {
                 '''
             }
             post {
-                always {
-                    // Archive coverage reports
-                    archiveArtifacts artifacts: 'coverage.xml', allowEmptyArchive: true
-                    
-                    // Publish coverage results using modern Coverage API plugin
-                    recordCoverage tools: [
-                        cobertura(pattern: 'coverage.xml')
-                    ]
-                }
                 failure {
                     echo "❌ Tests failed or coverage below ${COVERAGE_THRESHOLD}%. Pipeline stopped."
                 }
