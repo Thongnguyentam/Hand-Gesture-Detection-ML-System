@@ -93,6 +93,23 @@ Our production deployment includes a comprehensive observability stack:
 
 ---
 
+## Service Exposure with NGINX Ingress and nip.io
+
+
+To make our application and its associated observability tools accessible from the public internet, we use a combination of the NGINX Ingress Controller and the `nip.io` service. This provides a flexible and powerful way to manage external access to our internal services.
+
+1.  **NGINX Ingress as the Gateway**: The NGINX Ingress Controller is deployed as a `LoadBalancer` service within our GKE cluster. GCP automatically assigns a stable, external IP address to this LoadBalancer, making it our single entry point for all incoming traffic.
+
+2.  **Internal Services as ClusterIP**: The core `asl` application, along with Grafana, Prometheus, Kibana, and Jaeger, are all deployed as `ClusterIP` services. This is a security best practice, as it means they have no direct exposure to the internet and can only be reached from within the cluster.
+
+3.  **Routing with Ingress Rules**: For each service we want to expose, we create a corresponding Kubernetes `Ingress` resource. This resource defines rules that tell the NGINX Ingress Controller how to route traffic. For example, it maps a public hostname like `grafana.34.63.222.25.nip.io` to the internal Grafana `ClusterIP` service.
+
+4.  **Effortless Hostnames with `nip.io`**: Instead of buying a domain name or manually editing `/etc/hosts` files for development, we use `nip.io`. This free service provides wildcard DNS resolution. Any domain name formatted as `<anything>.<IP_ADDRESS>.nip.io` automatically resolves to that `<IP_ADDRESS>`. This allows us to create clean, memorable URLs for all our exposed services without any configuration.
+
+The complete flow is as follows: A request to `http://kibana.34.63.222.25.nip.io` is resolved by DNS to the external IP of our NGINX LoadBalancer. The Ingress Controller inspects the hostname and forwards the request to the correct internal service, bridging the gap between the public internet and our private cluster network.
+
+---
+
 ## CI/CD Pipeline
 
 The `Jenkinsfile` defines an automated, multi-branch pipeline that handles the entire lifecycle of the application. For a full breakdown of the pipeline's logic and stages, see the main `Jenkinsfile`.
