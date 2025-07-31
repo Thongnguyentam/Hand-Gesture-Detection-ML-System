@@ -27,7 +27,7 @@ RUN pip install --no-cache-dir uv
 RUN uv sync --locked
 
 # Check if uvicorn is installed
-RUN uvicorn --version
+RUN uvi`corn --version
 
 # Copy necessary files to our app
 COPY ./api ./api
